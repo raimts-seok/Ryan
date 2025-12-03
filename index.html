@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동파법 투자 전략 백테스터</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse (CSV Parser) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 max-w-6xl">
+        <!-- 헤더 -->
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-indigo-700">🌊 동파법(SOXL) 백테스터</h1>
+            <p class="text-sm text-gray-500 mt-2">안전/공세 모드 기반 동적 자산 배분 전략 시뮬레이션</p>
+        </header>
+
+        <!-- 입력 패널 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            
+            <!-- 1. 데이터 소스 설정 -->
+            <div class="bg-white p-5 rounded-lg shadow border-l-4 border-indigo-500">
+                <h2 class="font-bold text-lg mb-4">1. 데이터 연결 (DBALL)</h2>
+                
+                <!-- 구글 시트 자동 로드 -->
+                <div class="mb-4">
+                    <div id="loadingIndicator" class="flex items-center justify-center gap-2 text-blue-600 font-bold py-2 bg-blue-50 rounded border border-blue-200">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        데이터 불러오는 중...
+                    </div>
+                    
+                    <button id="reloadBtn" onclick="loadFromGoogleSheet()" class="hidden w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded border border-gray-300 transition flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        데이터 새로고침
+                    </button>
+                    <p class="text-xs text-gray-400 mt-2 text-center">* 페이지 로드 시 구글 시트에서 자동으로 데이터를 가져옵니다.</p>
+                </div>
+
+                <div id="dataStatus" class="mt-3 text-sm text-center font-bold"></div>
+            </div>
+
+            <!-- 2. 기본 설정 -->
+            <div class="bg-white p-5 rounded-lg shadow border-l-4 border-green-500">
+                <h2 class="font-bold text-lg mb-4">2. 기본 설정</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600">초기 투자금 ($)</label>
+                        <input type="number" id="initialCapital" value="100000" class="w-full border rounded px-2 py-1 text-right focus:ring-2 focus:ring-green-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600">위탁 수수료율 (%)</label>
+                        <input type="number" id="brokerFee" value="0.044" step="0.001" class="w-full border rounded px-2 py-1 text-right focus:ring-2 focus:ring-green-300 outline-none">
+                        <p class="text-[10px] text-gray-400 text-right">기본: 0.044%</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600">시작일</label>
+                        <input type="date" id="startDate" value="2024-01-02" class="w-full border rounded px-2 py-1 focus:ring-2 focus:ring-green-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600">종료일</label>
+                        <input type="date" id="endDate" value="2025-12-03" class="w-full border rounded px-2 py-1 focus:ring-2 focus:ring-green-300 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 모드 설정 -->
+            <div class="bg-white p-5 rounded-lg shadow border-l-4 border-yellow-500 text-sm">
+                <h2 class="font-bold text-lg mb-4">3. 모드별 설정 (%)</h2>
+                
+                <!-- 안전 모드 -->
+                <div class="mb-3 border-b pb-2">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-blue-600 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span> 안전 (SF)
+                        </span>
+                        <span class="text-xs text-gray-400">7분할</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">목표 수익(%)</label>
+                            <input type="number" id="sfProfit" value="1.8" step="0.1" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-blue-200 outline-none">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">매수 LOC(%)</label>
+                            <input type="number" id="sfLoc" value="6.0" step="0.1" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-blue-200 outline-none">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">보유 기간(일)</label>
+                            <input type="number" id="sfHold" value="40" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-blue-200 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 공세 모드 -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-red-600 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-red-600"></span> 공세 (AG)
+                        </span>
+                        <span class="text-xs text-gray-400">7분할</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">목표 수익(%)</label>
+                            <input type="number" id="agProfit" value="5.6" step="0.1" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-red-200 outline-none">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">매수 LOC(%)</label>
+                            <input type="number" id="agLoc" value="3.6" step="0.1" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-red-200 outline-none">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="text-xs text-gray-600 font-semibold block truncate">보유 기간(일)</label>
+                            <input type="number" id="agHold" value="7" class="w-full border rounded px-1 text-right focus:ring-2 focus:ring-red-200 outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 실행 버튼 -->
+        <button onclick="runBacktest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200 mb-8 text-lg transform hover:-translate-y-0.5">
+            🚀 설정값으로 백테스트 실행하기
+        </button>
+
+        <!-- 결과 요약 카드 -->
+        <div id="resultCards" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8 hidden">
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-indigo-500">
+                <p class="text-xs text-gray-500 font-bold uppercase">최종 자산</p>
+                <p id="resFinalValue" class="text-lg font-bold text-indigo-600 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-gray-500">
+                <p class="text-xs text-gray-500 font-bold uppercase">누적 수익률</p>
+                <p id="resTotalReturn" class="text-lg font-bold mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-green-500">
+                <p class="text-xs text-gray-500 font-bold uppercase">CAGR</p>
+                <p id="resCagr" class="text-lg font-bold text-green-600 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-red-500">
+                <p class="text-xs text-gray-500 font-bold uppercase">MDD</p>
+                <p id="resMdd" class="text-lg font-bold text-red-500 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-orange-400">
+                <p class="text-xs text-gray-500 font-bold uppercase">Pain Index</p>
+                <p id="resPain" class="text-lg font-bold text-orange-500 mt-1">-</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-purple-500">
+                <p class="text-xs text-gray-500 font-bold uppercase">GPR</p>
+                <p id="resGpr" class="text-lg font-bold text-purple-600 mt-1">-</p>
+            </div>
+        </div>
+
+        <!-- 차트 영역 -->
+        <div class="bg-white p-4 rounded-lg shadow mb-8 hidden" id="chartContainer">
+            <h3 class="font-bold text-lg mb-3 px-2">📈 자산 및 주가 추이</h3>
+            <div class="relative h-[400px]">
+                <canvas id="strategyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 상세 내역 테이블 -->
+        <div class="bg-white p-4 rounded-lg shadow overflow-x-auto hidden" id="tableContainer">
+            <h3 class="font-bold text-lg mb-3 px-2">📄 일별 상세 내역 (전체)</h3>
+            <table class="min-w-full text-xs border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase border-b">
+                        <th class="py-3 px-2 text-center sticky left-0 bg-gray-100 border-r z-10">날짜</th>
+                        <th class="py-3 px-2 text-right">종가</th>
+                        <th class="py-3 px-2 text-right">등락률</th>
+                        <th class="py-3 px-2 text-center">모드</th>
+                        <th class="py-3 px-2 text-right">투자금(Capital)</th>
+                        <th class="py-3 px-2 text-right">매수여력(BP)</th>
+                        <th class="py-3 px-2 text-right">매수량</th>
+                        <th class="py-3 px-2 text-center">포트</th>
+                        <th class="py-3 px-2 text-right bg-blue-50 text-blue-700">목표가(LOC)</th>
+                        <th class="py-3 px-2 text-center bg-red-50 text-red-700">매도일</th>
+                        <th class="py-3 px-2 text-right">평가액</th>
+                        <th class="py-3 px-2 text-right">예수금</th>
+                        <th class="py-3 px-2 text-right">실현수익(누적)</th>
+                        <th class="py-3 px-2 text-right">보유량</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody" class="text-gray-700 divide-y">
+                    <!-- JS로 추가됨 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 스크립트 영역 -->
+    <script>
+        // --- 상수 및 전역 변수 ---
+        const SHEET_ID = '1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs';
+        const SHEET_NAME = 'DBALL';
+        const SEC_FEE_RATE = 0.0000278;
+        const DECIMAL_4_START = new Date('2011-01-03');
+        const DECIMAL_4_END = new Date('2021-03-01');
+        
+        let rawPriceData = [];
+        let rawModeData = [];
+        let chartInstance = null;
+
+        // 페이지 로드 시 자동 실행
+        window.addEventListener('load', loadFromGoogleSheet);
+
+        // --- 유틸리티 함수 ---
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            let s = dateStr.trim().replace(/\.\([가-힣]+\)$/, '').replace(/\([가-힣]+\)$/, '').replace(/\.$/, '');
+            s = s.replace(/\./g, '-').replace(/ /g, '');
+            const parts = s.split('-');
+            if (parts.length === 3 && parts[0].length === 2) {
+                parts[0] = '20' + parts[0];
+            }
+            const date = new Date(parts.join('-'));
+            return isNaN(date) ? null : date;
+        }
+
+        function floorVal(val, decimals) {
+            const factor = Math.pow(10, decimals);
+            return Math.floor(val * factor) / factor;
+        }
+
+        function formatNum(num, fixed=2) {
+            return num.toLocaleString(undefined, {minimumFractionDigits: fixed, maximumFractionDigits: fixed});
+        }
+
+        // --- 데이터 로드 (구글 시트 Fetch) ---
+        async function loadFromGoogleSheet() {
+            document.getElementById('loadingIndicator').classList.remove('hidden');
+            document.getElementById('reloadBtn').classList.add('hidden');
+            document.getElementById('dataStatus').innerText = "";
+
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csvText = await response.text();
+                Papa.parse(csvText, {
+                    complete: function(results) { processCSV(results.data); },
+                    error: function(err) { throw err; }
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingIndicator').classList.add('hidden');
+                document.getElementById('reloadBtn').classList.remove('hidden');
+                document.getElementById('dataStatus').innerText = "데이터 로드 실패! (네트워크 오류 또는 권한 문제)";
+            }
+        }
+
+        function processCSV(data) {
+            rawPriceData = [];
+            rawModeData = [];
+
+            for (let i = 132; i < data.length; i++) {
+                const row = data[i];
+                if (!row[0] || !row[1]) continue;
+                const date = parseDate(row[0]);
+                const priceStr = String(row[1]).replace(/,/g, '');
+                const price = parseFloat(priceStr);
+                if (date && !isNaN(price)) rawPriceData.push({ date: date, close: price });
+            }
+
+            for (let i = 3; i < data.length; i++) {
+                const row = data[i];
+                if (!row[4] || !row[7]) continue; 
+                const date = parseDate(row[4]);
+                const mode = row[7].trim();
+                if (date && mode) rawModeData.push({ date: date, mode: mode });
+            }
+
+            rawPriceData.sort((a, b) => a.date - b.date);
+            rawModeData.sort((a, b) => a.date - b.date);
+
+            document.getElementById('loadingIndicator').classList.add('hidden');
+            document.getElementById('reloadBtn').classList.remove('hidden');
+            
+            const statusEl = document.getElementById('dataStatus');
+            if (rawPriceData.length > 0) {
+                statusEl.innerText = `데이터 준비 완료! (가격: ${rawPriceData.length}일 / 모드: ${rawModeData.length}일)`;
+                statusEl.className = "mt-3 text-sm text-green-600 font-bold text-center";
+            } else {
+                statusEl.innerText = "데이터 파싱 실패.";
+            }
+        }
+
+        // --- 백테스트 엔진 ---
+        function runBacktest() {
+            if (rawPriceData.length === 0) { alert("데이터가 로드되지 않았습니다."); return; }
+
+            const inputInitialCapital = parseFloat(document.getElementById('initialCapital').value);
+            const inputBrokerFee = parseFloat(document.getElementById('brokerFee').value);
+            
+            const inputSfProfit = parseFloat(document.getElementById('sfProfit').value);
+            const inputSfLoc = parseFloat(document.getElementById('sfLoc').value);
+            const inputSfHold = parseInt(document.getElementById('sfHold').value);
+
+            const inputAgProfit = parseFloat(document.getElementById('agProfit').value);
+            const inputAgLoc = parseFloat(document.getElementById('agLoc').value);
+            const inputAgHold = parseInt(document.getElementById('agHold').value);
+
+            const params = {
+                initialCapital: inputInitialCapital,
+                brokerFeeRate: inputBrokerFee / 100, 
+                startDate: new Date(document.getElementById('startDate').value),
+                endDate: new Date(document.getElementById('endDate').value),
+                sf: { profit: 1 + (inputSfProfit / 100), loc: 1 + (inputSfLoc / 100), hold: inputSfHold, split: 7 },
+                ag: { profit: 1 + (inputAgProfit / 100), loc: 1 + (inputAgLoc / 100), hold: inputAgHold, split: 7 },
+                capitalCycle: 10, reinvestRate: 0.85, lossRate: 0.35
+            };
+
+            let mergedData = [];
+            let currentModeIdx = 0;
+            
+            for (let i = 0; i < rawPriceData.length; i++) {
+                const p = rawPriceData[i];
+                if (p.date < params.startDate || p.date > params.endDate) continue;
+
+                while (currentModeIdx < rawModeData.length - 1 && rawModeData[currentModeIdx + 1].date <= p.date) {
+                    currentModeIdx++;
+                }
+                
+                let mode = rawModeData.length > 0 ? rawModeData[currentModeIdx].mode : 'SF'; 
+                if (rawModeData.length > 0 && p.date < rawModeData[0].date) mode = rawModeData[0].mode;
+
+                mergedData.push({ date: p.date, close: p.close, mode: mode });
+            }
+
+            if (mergedData.length < 2) { alert("선택한 기간에 데이터가 부족합니다."); return; }
+
+            let investCapital = params.initialCapital;
+            let cash = params.initialCapital;
+            let holdings = []; 
+            let history = [];
+            
+            let daysSinceUpdate = 0;
+            let periodProfit = 0;
+            let cumulativeProfit = 0;
+
+            for (let i = 1; i < mergedData.length; i++) {
+                const curr = mergedData[i];
+                const prev = mergedData[i-1];
+                
+                const date = curr.date;
+                const close = curr.close;
+                const prevClose = prev.close;
+                const mode = curr.mode;
+
+                let precisionPrice = 2;
+                let precisionSeed = 0;
+                if (date >= DECIMAL_4_START && date <= DECIMAL_4_END) {
+                    precisionPrice = 4;
+                    precisionSeed = 2;
+                }
+
+                const startHoldingsCnt = holdings.length;
+
+                daysSinceUpdate++;
+                if (daysSinceUpdate >= params.capitalCycle) {
+                    if (periodProfit > 0) investCapital += (periodProfit * params.reinvestRate);
+                    else investCapital += (periodProfit * params.lossRate);
+                    periodProfit = 0;
+                    daysSinceUpdate = 0;
+                }
+
+                let buyingPower = cash;
+                let nextHoldings = [];
+                let isSold = false;
+                
+                for (let h of holdings) {
+                    let rule = (h.mode === 'SF' || h.mode === '안전') ? params.sf : params.ag;
+                    let targetPriceRaw = h.buyPrice * rule.profit;
+                    let targetPrice = floorVal(targetPriceRaw, precisionPrice);
+                    
+                    isSold = false;
+                    let sellPrice = 0;
+
+                    if (h.daysHeld >= (rule.hold - 1)) { isSold = true; sellPrice = close; } 
+                    else if (close >= targetPrice) { isSold = true; sellPrice = close; }
+
+                    if (isSold) {
+                        let revenue = sellPrice * h.qty;
+                        let brokerFee = floorVal(revenue * params.brokerFeeRate, precisionPrice);
+                        let secFee = parseFloat((revenue * SEC_FEE_RATE).toFixed(precisionPrice));
+                        let fee = brokerFee + secFee;
+                        let netRev = revenue - fee;
+                        let buyCostRaw = h.buyPrice * h.qty;
+                        let profit = netRev - buyCostRaw - (h.buyFee || 0);
+
+                        cash += netRev;
+                        cumulativeProfit += profit;
+                        periodProfit += profit;
+                        
+                        h.sellDate = date;
+                    } else {
+                        h.daysHeld++;
+                        nextHoldings.push(h);
+                    }
+                }
+                holdings = nextHoldings;
+
+                let rule = (mode === 'SF' || mode === '안전') ? params.sf : params.ag;
+                let splitCnt = (mode === 'SF' || mode === '안전') ? params.sf.split : params.ag.split;
+
+                let targetBuyPriceRaw = prevClose * rule.loc;
+                let targetBuyPrice = floorVal(targetBuyPriceRaw, precisionPrice);
+                let buyExecutedQty = 0;
+                let newPort = null;
+
+                if (startHoldingsCnt < splitCnt) {
+                    if (close <= targetBuyPrice) {
+                        let capitalRounded = parseFloat(investCapital.toFixed(precisionPrice));
+                        let onePortCash = floorVal(capitalRounded / splitCnt, precisionSeed);
+
+                        if (targetBuyPrice > 0) {
+                            let qty = Math.floor(onePortCash / targetBuyPrice);
+                            let expectedAmt = qty * targetBuyPrice;
+                            let expectedFee = floorVal(expectedAmt * params.brokerFeeRate, precisionPrice);
+                            
+                            if ((expectedAmt + expectedFee) > buyingPower) {
+                                qty = Math.floor(buyingPower / (targetBuyPrice * (1 + params.brokerFeeRate)));
+                            }
+
+                            if (qty > 0) {
+                                let buyAmt = qty * close;
+                                let fee = floorVal(buyAmt * params.brokerFeeRate, precisionPrice);
+                                let totalCost = buyAmt + fee;
+
+                                if (totalCost <= cash) {
+                                    cash -= totalCost;
+                                    buyExecutedQty = qty;
+                                    
+                                    newPort = {
+                                        buyDate: date,
+                                        buyPrice: close,
+                                        qty: qty,
+                                        mode: mode,
+                                        daysHeld: 0,
+                                        buyFee: fee,
+                                        sellDate: null
+                                    };
+                                    holdings.push(newPort);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                let stockVal = 0;
+                let totalQty = 0;
+                for (let h of holdings) {
+                    stockVal += h.qty * close;
+                    totalQty += h.qty;
+                }
+                let totalAsset = cash + stockVal;
+
+                history.push({
+                    date: date,
+                    close: close,
+                    mode: mode,
+                    capital: investCapital,
+                    bp: buyingPower,
+                    targetBuy: targetBuyPrice,
+                    buyQty: buyExecutedQty,
+                    newPort: newPort, 
+                    val: totalAsset,
+                    cash: cash,
+                    profit: cumulativeProfit,
+                    qty: totalQty,
+                    cnt: holdings.length
+                });
+            }
+
+            displayResults(history, params.initialCapital);
+        }
+
+        function displayResults(history, startVal) {
+            document.getElementById('resultCards').classList.remove('hidden');
+            document.getElementById('chartContainer').classList.remove('hidden');
+            document.getElementById('tableContainer').classList.remove('hidden');
+
+            const last = history[history.length - 1];
+            const endVal = last.val;
+            const totalProfit = endVal - startVal;
+            const ret = (totalProfit / startVal) * 100;
+
+            const days = (last.date - history[0].date) / (1000 * 60 * 60 * 24);
+            const years = days / 365.25;
+            const cagr = years > 0 ? (Math.pow(endVal / startVal, 1 / years) - 1) * 100 : 0;
+
+            let maxPeak = -Infinity;
+            let dds = [];
+            let mdd = 0;
+            
+            history.forEach(h => {
+                if (h.val > maxPeak) maxPeak = h.val;
+                let dd = (h.val - maxPeak) / maxPeak;
+                if (dd < mdd) mdd = dd;
+                dds.push(dd);
+            });
+            mdd *= 100;
+
+            const painIndex = Math.abs(dds.reduce((a, b) => a + b, 0) / dds.length) * 100;
+            const gpr = painIndex > 0 ? cagr / painIndex : 0;
+            const calmar = mdd !== 0 ? cagr / Math.abs(mdd) : 0;
+
+            document.getElementById('resFinalValue').innerText = `$${formatNum(endVal)}`;
+            document.getElementById('resTotalReturn').innerText = `${formatNum(ret)}%`;
+            document.getElementById('resTotalReturn').className = `text-lg font-bold mt-1 ${ret >= 0 ? 'text-red-500' : 'text-blue-500'}`;
+            document.getElementById('resCagr').innerText = `${formatNum(cagr)}%`;
+            document.getElementById('resMdd').innerText = `${formatNum(mdd)}%`;
+            document.getElementById('resPain').innerText = `${formatNum(painIndex)}%`;
+            document.getElementById('resGpr').innerText = formatNum(gpr);
+
+            drawChart(history, dds);
+            drawTable(history);
+        }
+
+        function drawChart(history, dds) {
+            const ctx = document.getElementById('strategyChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const labels = history.map(h => h.date.toISOString().slice(0, 10));
+            const dataVal = history.map(h => h.val);
+            const dataClose = history.map(h => h.close);
+            const dataDD = dds.map(d => d * 100);
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '자산 가치 ($)',
+                            data: dataVal,
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.1,
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'SOXL 주가 ($)',
+                            data: dataClose,
+                            borderColor: 'rgb(255, 99, 132)',
+                            yAxisID: 'y1',
+                            tension: 0.1,
+                            pointRadius: 1, // 변경: 1
+                            borderWidth: 1, // 선 두께
+                            // borderDash 제거 (실선)
+                            fill: false
+                        },
+                        {
+                            label: 'Drawdown (%)',
+                            data: dataDD,
+                            borderColor: 'rgba(153, 102, 255, 0.5)',
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            yAxisID: 'y2',
+                            type: 'line',
+                            fill: true,
+                            pointRadius: 0,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { ticks: { maxTicksLimit: 10 } },
+                        y: {
+                            type: 'linear', display: true, position: 'right',
+                            title: { display: true, text: 'Asset ($)' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'left',
+                            title: { display: true, text: 'SOXL ($)' }
+                        },
+                        y2: {
+                            type: 'linear', display: true, position: 'right',
+                            min: -100, max: 0,
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawTable(history) {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+            
+            const rows = history.map((h, i) => {
+                const dateStr = h.date.toISOString().slice(0, 10);
+                const modeClass = h.mode === 'AG' ? 'text-red-500 font-bold' : 'text-blue-500 font-bold';
+                const buyQtyClass = h.buyQty > 0 ? 'bg-red-50 font-bold' : '';
+                
+                // 매도일 표시
+                let sellDateStr = '-';
+                if (h.newPort) {
+                    if (h.newPort.sellDate) {
+                        sellDateStr = `<span class="text-indigo-600 font-bold">${h.newPort.sellDate.toISOString().slice(0, 10)}</span>`;
+                    } else {
+                        sellDateStr = '<span class="text-gray-400 text-[10px]">보유중</span>';
+                    }
+                }
+                
+                let changeRate = 0;
+                if (i > 0) {
+                    const prevClose = history[i-1].close;
+                    changeRate = ((h.close - prevClose) / prevClose) * 100;
+                }
+                const changeClass = changeRate >= 0 ? 'text-red-600' : 'text-blue-600';
+                const changeSign = changeRate >= 0 ? '+' : '';
+
+                return `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-2 px-2 text-center text-gray-500 sticky left-0 bg-gray-50 border-r">${dateStr}</td>
+                        <td class="py-2 px-2 text-right">${formatNum(h.close, 4)}</td>
+                        <td class="py-2 px-2 text-right text-xs ${changeClass}">${changeSign}${formatNum(changeRate)}%</td>
+                        <td class="py-2 px-2 text-center ${modeClass}">${h.mode}</td>
+                        <td class="py-2 px-2 text-right text-gray-600 font-mono">${formatNum(h.capital, 0)}</td>
+                        <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.bp, 0)}</td>
+                        <td class="py-2 px-2 text-right ${buyQtyClass}">${h.buyQty > 0 ? h.buyQty : '-'}</td>
+                        <td class="py-2 px-2 text-center font-bold text-gray-600">${h.cnt}</td>
+                        <td class="py-2 px-2 text-right text-gray-500 bg-blue-50">${formatNum(h.targetBuy, 4)}</td>
+                        <td class="py-2 px-2 text-center bg-red-50">${sellDateStr}</td>
+                        <td class="py-2 px-2 text-right font-medium font-mono">${formatNum(h.val, 0)}</td>
+                        <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.cash, 0)}</td>
+                        <td class="py-2 px-2 text-right text-gray-700">${formatNum(h.profit, 2)}</td>
+                        <td class="py-2 px-2 text-right">${h.qty}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = rows;
+        }
+    </script>
+</body>
+</html>
