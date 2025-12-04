@@ -247,8 +247,8 @@
                             <th class="py-3 px-2 text-right">매수여력</th>
                             <th class="py-3 px-2 text-center text-blue-600 font-bold">매수량</th>
                             <th class="py-3 px-2 text-center">포트</th>
-                            <th class="py-3 px-2 bg-blue-50 text-blue-700 border-l">목표가</th>
-                            <th class="py-3 px-2 text-center bg-red-50 text-red-700 border-r">매도일</th>
+                            <th class="py-3 px-2 bg-blue-50 text-blue-700">목표가</th>
+                            <th class="py-3 px-2 text-center bg-red-50 text-red-700">매도일</th>
                             <th class="py-3 px-2 font-bold">평가액</th>
                             <th class="py-3 px-2 text-gray-400">예수금</th>
                             <th class="py-3 px-2">실현수익</th>
@@ -279,6 +279,18 @@
         window.addEventListener('load', loadFromGoogleSheet);
 
         // --- 유틸리티 함수 ---
+        // 내림(절사) 처리 함수
+        function floorVal(val, decimals) {
+            const factor = Math.pow(10, decimals);
+            return Math.floor(val * factor) / factor;
+        }
+
+        // 반올림 처리 함수 (Math.round를 사용하되, 자릿수를 지정 가능하게 확장)
+        function roundVal(val, decimals) {
+            const factor = Math.pow(10, decimals);
+            return Math.round(val * factor) / factor;
+        }
+
         function parseDate(dateStr) {
             if (!dateStr) return null;
             let s = String(dateStr).trim();
@@ -310,11 +322,6 @@
             return isNaN(date.getTime()) ? null : date;
         }
 
-
-        function floorVal(val, decimals) {
-            const factor = Math.pow(10, decimals);
-            return Math.floor(val * factor) / factor;
-        }
 
         function formatNum(num, fixed=2) {
             return num.toLocaleString(undefined, {minimumFractionDigits: fixed, maximumFractionDigits: fixed});
@@ -544,13 +551,8 @@
 
                 const startHoldingsCnt = holdings.length;
 
+                // daysSinceUpdate increment
                 daysSinceUpdate++;
-                if (daysSinceUpdate >= capitalCycle) {
-                    if (periodProfit > 0) investCapital += (periodProfit * reinvestRate);
-                    else investCapital += (periodProfit * lossRate);
-                    periodProfit = 0;
-                    daysSinceUpdate = 0;
-                }
 
                 let buyingPower = cash;
                 let nextHoldings = [];
@@ -558,7 +560,10 @@
 
                 for (let h of holdings) {
                     let rule = (h.mode === 'SF' || h.mode === '안전') ? sf : ag;
-                    let targetPrice = floorVal(h.buyPrice * rule.profit, precPrice);
+                    
+                    // NEW: 목표 매도가 (targetPrice) - precPrice + 반올림
+                    let targetPrice = roundVal(h.buyPrice * rule.profit, precPrice);
+                    
                     let isSold = false, sellPrice = 0;
 
                     if (h.daysHeld >= (rule.hold - 1)) { isSold = true; sellPrice = close; }
@@ -566,22 +571,35 @@
 
                     if (isSold) {
                         let revenue = sellPrice * h.qty;
+                        
+                        // NEW: 위탁 수수료 (feeBroker) - precPrice + 내림
                         let feeBroker = floorVal(revenue * (inputBrokerFee/100), precPrice);
                         
                         // SEC Fee 조건부 계산
+                        // NEW: SEC Fee (feeSec) - precPrice + 내림 (기존 toFixed에서 floorVal로 변경)
                         let feeSec = 0;
                         if (useSecFee) {
-                            feeSec = parseFloat((revenue * SEC_FEE_RATE).toFixed(precPrice));
+                            let tempSecFee = revenue * SEC_FEE_RATE;
+                            feeSec = floorVal(tempSecFee, precPrice);
                         }
                         
                         let fee = feeBroker + feeSec;
                         
                         let netRev = revenue - fee;
-                        let profit = netRev - (h.buyPrice * h.qty) - (h.buyFee || 0);
+                        let profit = netRev - (h.buyPrice * h.qty) - (h.buyFee || 0); // 소수점 처리 안 된 원본 이익
 
-                        cash += netRev;
-                        cumulativeProfit += profit;
-                        periodProfit += profit;
+                        // NEW: 실현 손익 (profit) - precPrice + 반올림 (화면 표시용)
+                        let roundedProfit = roundVal(profit, precPrice);
+                        
+                        // NEW: 예수금 (cash) - precPrice + 반올림
+                        let roundedNetRev = roundVal(netRev, precPrice);
+
+                        cash = roundVal(cash + roundedNetRev, precPrice); // 예수금 업데이트 시에도 precPrice 반올림 적용
+                        cumulativeProfit += roundedProfit; // 화면 표시용 누적은 반올림 값 사용
+                        
+                        // [수정됨] 투자금 갱신용 기간 수익 합산은 '원본 값(profit)'을 그대로 더함
+                        periodProfit += profit; 
+                        
                         soldToday = true;
                         h.sellDate = date;
                     } else {
@@ -594,21 +612,26 @@
                 let rule = (mode === 'SF' || mode === '안전') ? sf : ag;
                 let splitCnt = (mode === 'SF' || mode === '안전') ? sf.split : ag.split;
 
+                // NEW: 목표 매수가 (targetBuyPrice) - precPrice + 내림
                 let targetBuyPrice = floorVal(prevClose * rule.loc, precPrice);
                 let buyExecutedQty = 0;
                 let newPort = null;
 
                 if (startHoldingsCnt < splitCnt) {
                     if (close <= targetBuyPrice) {
-                        let capitalRounded = parseFloat(investCapital.toFixed(precPrice));
-                        let onePortCash = floorVal(capitalRounded / splitCnt, precSeed);
+                        // NEW: 1회 분할 시드 (onePortCash) - precSeed + 내림
+                        let onePortCash = floorVal(investCapital / splitCnt, precSeed);
 
                         if (targetBuyPrice > 0) {
+                            // NEW: 매수 수량 (qty) - 정수 + 내림
                             let qty = Math.floor(onePortCash / targetBuyPrice);
                             let estAmt = qty * targetBuyPrice;
+                            
+                            // 매수 수수료 산정 시, 정밀도 기준은 precPrice + 내림으로 유지
                             let estFee = floorVal(estAmt * (inputBrokerFee/100), precPrice);
 
                             if ((estAmt + estFee) > buyingPower) {
+                                // 매수 여력이 부족하면 구매 가능 수량 다시 계산 (내림)
                                 qty = Math.floor(buyingPower / (targetBuyPrice * (1 + (inputBrokerFee/100))));
                             }
 
@@ -619,6 +642,10 @@
 
                                 if (totalCost <= cash) {
                                     cash -= totalCost;
+                                    
+                                    // 예수금 차감 후 precPrice 반올림
+                                    cash = roundVal(cash, precPrice); 
+
                                     buyExecutedQty = qty;
                                     newPort = {
                                         buyDate: date, buyPrice: close, qty: qty, mode: mode, daysHeld: 0, buyFee: fee, sellDate: null
@@ -629,6 +656,21 @@
                         }
                     }
                 }
+
+                // --- CAPITAL UPDATE LOGIC MOVED HERE ---
+                // Update happens AFTER trading on the cycle day (e.g., Day 10)
+                // This ensures Day 10 profits are included, and Day 11 uses new capital.
+                if (daysSinceUpdate >= capitalCycle) {
+                    let profitToReinvest = periodProfit * (periodProfit > 0 ? reinvestRate : lossRate);
+                    investCapital += profitToReinvest;
+                    
+                    // NEW: 총 투자금 (investCapital) - precSeed + 반올림
+                    investCapital = roundVal(investCapital, precSeed);
+                    
+                    periodProfit = 0;
+                    daysSinceUpdate = 0;
+                }
+                // ---------------------------------------
 
                 let stockVal = holdings.reduce((sum, h) => sum + (h.qty * close), 0);
                 let totalQty = holdings.reduce((sum, h) => sum + h.qty, 0);
