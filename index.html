@@ -57,15 +57,16 @@
             
             <!-- 1. 기본 설정 -->
             <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-green-500">
-                <h2 class="font-bold text-lg mb-3 text-gray-700">1. 기본 설정</h2>
+                <h2 class="font-bold text-lg mb-8 text-gray-700">1. 기본 설정</h2>
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">초기 투자금 ($)</label>
-                            <input type="number" id="initialCapital" value="10000" class="w-full border border-gray-300 rounded px-2 py-1 text-right text-sm focus:ring-2 focus:ring-green-200 outline-none">
+                            <!-- 콤마 입력을 위해 type="text"로 변경 및 oninput 핸들러 추가 -->
+                            <input type="text" id="initialCapital" value="10,000" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');" class="w-full border border-gray-300 rounded px-2 py-1 text-right text-sm font-bold focus:ring-2 focus:ring-green-200 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">위탁 수수료 (%)</label>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">수수료 (%)</label>
                             <input type="number" id="brokerFee" value="0.044" step="0.001" class="w-full border border-gray-300 rounded px-2 py-1 text-right text-sm focus:ring-2 focus:ring-green-200 outline-none">
                             <div class="flex items-center justify-end mt-1 gap-1">
                                 <input type="checkbox" id="useSecFee" checked class="w-3 h-3 text-green-600 rounded focus:ring-green-500 border-gray-300 cursor-pointer">
@@ -76,11 +77,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">시작일</label>
-                            <input type="date" id="startDate" value="2024-01-02" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-green-200 outline-none">
+                            <input type="date" id="startDate" value="2024-01-02" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-green-200 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">종료일</label>
-                            <input type="date" id="endDate" value="2025-12-03" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-green-200 outline-none">
+                            <input type="date" id="endDate" value="2025-12-03" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-green-200 outline-none">
                         </div>
                     </div>
                 </div>
@@ -90,8 +91,8 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-yellow-400">
                 <h2 class="font-bold text-lg mb-3 text-gray-700">2. 모드별 설정 (%)</h2>
                 
-                <!-- 안전 모드 -->
-                <div class="mb-3 pb-2 border-b border-dashed border-gray-200">
+                <!-- 안전 모드: mb-3을 mb-1로 수정하여 아래 간격 줄임 -->
+                <div class="mb-1 pb-2 border-b border-dashed border-gray-200">
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-blue-600 flex items-center gap-1.5 text-sm">
                             <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> 안전 (SF)
@@ -100,19 +101,19 @@
                     <div class="grid grid-cols-4 gap-2">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">매수</label>
-                            <input type="number" id="sfLoc" value="6.0" step="0.1" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
+                            <input type="number" id="sfLoc" value="6.0" step="0.1" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">매도</label>
-                            <input type="number" id="sfProfit" value="1.8" step="0.1" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
+                            <input type="number" id="sfProfit" value="1.8" step="0.1" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">분할</label>
-                            <input type="number" id="sfSplit" value="7" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
+                            <input type="number" id="sfSplit" value="7" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">보유일</label>
-                            <input type="number" id="sfHold" value="40" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
+                            <input type="number" id="sfHold" value="40" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-400 outline-none">
                         </div>
                     </div>
                 </div>
@@ -440,7 +441,8 @@
         function runBacktest() {
             if (rawPriceData.length === 0) { alert("데이터 로딩 중입니다. 잠시만 기다려주세요."); return; }
 
-            const inputInitialCapital = parseFloat(document.getElementById('initialCapital').value);
+            // 콤마 제거 후 파싱
+            const inputInitialCapital = parseFloat(document.getElementById('initialCapital').value.replace(/,/g, ''));
             const inputBrokerFee = parseFloat(document.getElementById('brokerFee').value);
             const useSecFee = document.getElementById('useSecFee').checked; // SEC Fee 체크 여부 확인
             const startDate = new Date(document.getElementById('startDate').value);
