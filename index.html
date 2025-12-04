@@ -281,15 +281,35 @@
         // --- 유틸리티 함수 ---
         function parseDate(dateStr) {
             if (!dateStr) return null;
-            let s = dateStr.trim().replace(/\.\([가-힣]+\)$/, '').replace(/\([가-힣]+\)$/, '').replace(/\.$/, '');
-            s = s.replace(/\./g, '-').replace(/ /g, '');
+            let s = String(dateStr).trim();
+            
+            // Aggressive cleaning: remove non-essential chars (spaces, commas, parentheses, zero-width space)
+            s = s.replace(/\s*\(.*\)\s*$/, '')
+                 .replace(/\.$/, '')
+                 .replace(/[\s,]/g, '')
+                 .replace(/\u200B/g, ''); // Remove zero-width space
+
+            // Convert all common separators (., /) to hyphen (-)
+            s = s.replace(/[\.\/]/g, '-');
+            
             const parts = s.split('-');
-            if (parts.length === 3 && parts[0].length === 2) {
-                parts[0] = '20' + parts[0];
+            
+            if (parts.length === 3) {
+                // Ensure 4-digit year (handles 25-08-15 -> 2025-08-15)
+                if (parts[0].length === 2) {
+                    parts[0] = '20' + parts[0];
+                }
+            } else {
+                return null; // Invalid format
             }
+            
+            // Attempt to create Date object
             const date = new Date(parts.join('-'));
-            return isNaN(date) ? null : date;
+            
+            // Use date.getTime() to check validity robustly
+            return isNaN(date.getTime()) ? null : date;
         }
+
 
         function floorVal(val, decimals) {
             const factor = Math.pow(10, decimals);
@@ -348,15 +368,28 @@
             rawPriceData = [];
             rawModeData = [];
 
+            const targetDateStr = '2025-08-15';
+            let foundTargetDate = false;
+
             for (let i = 132; i < data.length; i++) {
                 const row = data[i];
+                
                 if (!row[0] || !row[1]) continue;
+
                 const date = parseDate(row[0]);
                 const priceStr = String(row[1]).replace(/,/g, '');
                 const price = parseFloat(priceStr);
-                if (date && !isNaN(price)) rawPriceData.push({ date: date, close: price });
-            }
 
+                // 파싱 성공 및 유효한 가격일 경우에만 데이터 추가
+                if (date && !isNaN(price)) {
+                    rawPriceData.push({ date: date, close: price });
+                    if (date.toISOString().slice(0, 10) === targetDateStr) {
+                         foundTargetDate = true;
+                    }
+                }
+            }
+            
+            // 모드 데이터 로딩
             for (let i = 3; i < data.length; i++) {
                 const row = data[i];
                 if (!row[4] || !row[7]) continue; 
@@ -375,8 +408,16 @@
                 const startY = rawPriceData[0].date.getFullYear();
                 const endY = rawPriceData[rawPriceData.length-1].date.getFullYear();
                 
-                // 최신 데이터 날짜 확인용 로그
-                console.log("Last Date loaded:", rawPriceData[rawPriceData.length-1].date);
+                // --- 최종 디버깅 로그 (문제 해결 확인용) ---
+                console.log("--- [데이터 로드 최종 확인] ---");
+                console.log(`총 주가 데이터 개수: ${rawPriceData.length}개`);
+                if (foundTargetDate) {
+                    console.log('✅ 2025-08-15 데이터가 성공적으로 로드되어 백테스트에 사용될 예정입니다.');
+                } else {
+                    // 파싱 로직을 수정했음에도 실패하면 원본 데이터 형식에 문제가 있음을 다시 알림
+                    console.error('❌ 날짜 파싱 로직을 강화했으나 2025-08-15 데이터가 여전히 로드되지 않았습니다. 원본 CSV 파일의 2025-08-15 날짜 셀을 확인해 주세요. (날짜가 쉼표나 다른 이상 문자를 포함하는지)');
+                }
+                console.log("------------------------");
                 
                 badge.className = "flex items-center gap-2 text-sm font-bold text-green-600 bg-white px-3 py-1 rounded-full shadow-sm";
                 badge.innerHTML = `🟢 데이터 준비됨 (${startY}~${endY})`;
@@ -423,22 +464,54 @@
             let mergedData = [];
             let currentModeIdx = 0;
             
-            for (let i = 0; i < rawPriceData.length; i++) {
-                const p = rawPriceData[i];
-                // 날짜 필터링 시 endDate가 23:59:59로 설정되어 있으므로 해당 일자 데이터 포함됨
-                if (p.date < startDate || p.date > endDate) continue;
+            // 1. Find the index of the first data point *on or after* startDate
+            let priceStartIndex = rawPriceData.findIndex(p => p.date >= startDate);
 
+            if (priceStartIndex === -1) {
+                alert("선택된 시작일 이후의 데이터가 없습니다.");
+                return;
+            }
+
+            // 2. Include the day *before* startDate if available (for 'prevClose')
+            let loopStart = priceStartIndex;
+            if (priceStartIndex > 0) {
+                loopStart = priceStartIndex - 1;
+            }
+
+            // 3. Populate mergedData from the reference day (if exists) up to endDate
+            for (let i = loopStart; i < rawPriceData.length; i++) {
+                const p = rawPriceData[i];
+
+                // Stop if date exceeds the user's endDate
+                if (p.date > endDate) break;
+
+                // --- Mode Finding Logic ---
                 while (currentModeIdx < rawModeData.length - 1 && rawModeData[currentModeIdx + 1].date <= p.date) {
                     currentModeIdx++;
                 }
                 
                 let mode = rawModeData.length > 0 ? rawModeData[currentModeIdx].mode : 'SF'; 
                 if (rawModeData.length > 0 && p.date < rawModeData[0].date) mode = rawModeData[0].mode;
+                // --- End Mode Finding Logic ---
 
                 mergedData.push({ date: p.date, close: p.close, mode: mode });
             }
 
-            if (mergedData.length < 2) { alert("해당 기간의 데이터가 부족합니다."); return; }
+            if (mergedData.length < 2) { 
+                alert("백테스트를 실행하기 위한 최소 2일(전일 종가 및 시작일)의 데이터가 부족합니다."); 
+                return; 
+            } 
+
+            // --- 디버깅 로그 1: 병합된 데이터 확인 ---
+            console.log(`\n--- [백테스트 데이터 병합 결과] ---`);
+            console.log(`총 병합된 데이터 개수: ${mergedData.length}일`);
+            console.log(`[0] 기준일(전일): ${mergedData[0].date.toISOString().slice(0, 10)}`);
+            console.log(`[1] 실제 매매 시작일: ${mergedData[1].date.toISOString().slice(0, 10)}`);
+            if (mergedData.length > 2) {
+                console.log(`[2] 다음 거래일: ${mergedData[2].date.toISOString().slice(0, 10)}`);
+            }
+            console.log("---------------------------------");
+            // ----------------------------------------
 
             let investCapital = inputInitialCapital;
             let cash = inputInitialCapital;
@@ -448,6 +521,8 @@
             let periodProfit = 0;
             let cumulativeProfit = 0;
 
+            
+            // 루프는 두 번째 날짜(mergedData[1], 즉 시작일)부터 시작하여 첫 날짜(mergedData[0], 전일)의 종가를 전일 기준으로 사용하여 매매 로직 실행
             for (let i = 1; i < mergedData.length; i++) {
                 const curr = mergedData[i];
                 const prev = mergedData[i-1];
@@ -455,6 +530,12 @@
                 const close = curr.close;
                 const prevClose = prev.close;
                 const mode = curr.mode;
+                const dateStr = date.toISOString().slice(0, 10);
+                
+                if (dateStr === '2025-08-15') {
+                    console.log(`🎉 [LOOP CONFIRM] 2025-08-15의 거래 로직을 실행합니다.`);
+                }
+
 
                 let precPrice = 2, precSeed = 0;
                 if (date >= DECIMAL_4_START && date <= DECIMAL_4_END) {
@@ -562,6 +643,19 @@
                 });
             }
 
+            // --- 디버깅 로그 3: 최종 기록된 내역 확인 ---
+            const finalHistoryDates = history.map(h => h.date.toISOString().slice(0, 10));
+            console.log(`\n--- [최종 기록 내역 확인] ---`);
+            console.log(`총 기록된 일수: ${history.length}일`);
+            if (finalHistoryDates.includes('2025-08-15')) {
+                console.log('✅ 2025-08-15가 최종 기록에 포함되었습니다.');
+            } else {
+                console.error('❌ 2025-08-15가 최종 기록에 포함되지 않았습니다.');
+            }
+            console.log(`기록 시작일: ${finalHistoryDates[0]}`);
+            console.log(`기록 종료일: ${finalHistoryDates[finalHistoryDates.length - 1]}`);
+            console.log("---------------------------------");
+            
             displayResults(history, inputInitialCapital);
         }
 
@@ -730,8 +824,8 @@
                         <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.bp, 0)}</td>
                         <td class="py-2 px-2 text-center ${buyClass}">${h.buyQty > 0 ? h.buyQty : '-'}</td>
                         <td class="py-2 px-2 text-center font-bold text-gray-600">${h.cnt}</td>
-                        <td class="py-2 px-2 text-right text-blue-600 bg-blue-50/50 text-[11px] border-l border-blue-100">${formatNum(h.targetBuy, 2)}</td>
-                        <td class="py-2 px-2 text-center bg-red-50/50 border-r border-red-100">${sellDateStr}</td>
+                        <td class="py-2 px-2 text-right text-blue-600 bg-blue-50/50 text-[11px]">${formatNum(h.targetBuy, 2)}</td>
+                        <td class="py-2 px-2 text-center bg-red-50/50">${sellDateStr}</td>
                         <td class="py-2 px-2 text-right font-bold text-gray-800">${formatNum(h.val, 0)}</td>
                         <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.cash, 0)}</td>
                         <td class="py-2 px-2 text-right font-medium ${profitClass}">${formatNum(h.profit, 0)}</td>
