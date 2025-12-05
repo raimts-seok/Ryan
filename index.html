@@ -52,8 +52,8 @@
             </div>
         </header>
 
-        <!-- 설정 패널 (컴팩트 모드) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <!-- 설정 패널 (4열 레이아웃) -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             
             <!-- 1. 기본 설정 -->
             <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-green-500">
@@ -77,11 +77,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">시작일</label>
-                            <input type="date" id="startDate" value="2024-01-02" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-green-200 outline-none">
+                            <input type="date" id="startDate" value="2024-01-02" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-green-200 outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">종료일</label>
-                            <input type="date" id="endDate" value="2025-12-03" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-green-200 outline-none">
+                            <input type="date" id="endDate" value="2025-12-03" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-2 focus:ring-green-200 outline-none">
                         </div>
                     </div>
                 </div>
@@ -128,19 +128,19 @@
                     <div class="grid grid-cols-4 gap-2">
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">매수</label>
-                            <input type="number" id="agLoc" value="3.6" step="0.1" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
+                            <input type="number" id="agLoc" value="3.6" step="0.1" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">매도</label>
-                            <input type="number" id="agProfit" value="5.6" step="0.1" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
+                            <input type="number" id="agProfit" value="5.6" step="0.1" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">분할</label>
-                            <input type="number" id="agSplit" value="7" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
+                            <input type="number" id="agSplit" value="7" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-gray-500 mb-0.5 text-center">보유일</label>
-                            <input type="number" id="agHold" value="7" class="w-full border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
+                            <input type="number" id="agHold" value="7" class="w-full border border-gray-300 rounded px-1 py-0.5 text-right text-sm font-bold text-gray-700 focus:ring-1 focus:ring-red-400 outline-none">
                         </div>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-purple-500">
                 <h2 class="font-bold text-lg mb-3 text-gray-700">3. 투자금 갱신 설정</h2>
                 <div class="space-y-3">
-                    <!-- px-3 클래스를 추가하여 아래 박스와 좌우 라인 정렬 -->
+                    <!-- 갱신 주기 -->
                     <div class="flex justify-between items-center border-b border-gray-100 pb-2 px-3">
                         <label class="text-xs font-bold text-gray-600">갱신 주기</label>
                         <div class="flex items-center">
@@ -158,6 +158,8 @@
                             <span class="text-gray-500 text-xs ml-1 font-bold">일</span>
                         </div>
                     </div>
+
+                    <!-- 수익/손실 반영률 -->
                     <div class="bg-purple-50 p-3 rounded-lg border border-purple-100 space-y-2">
                         <div class="flex justify-between items-center">
                             <label class="text-xs font-bold text-blue-700">수익 시 반영률</label>
@@ -170,6 +172,68 @@
                             <label class="text-xs font-bold text-red-600">손실 시 반영률</label>
                             <div class="flex items-center">
                                 <input type="number" id="lossRate" value="35" class="w-14 border border-gray-300 rounded px-1 py-1 text-right text-sm font-bold text-red-500 bg-white focus:ring-1 focus:ring-red-400 outline-none">
+                                <span class="text-gray-500 text-[10px] ml-1">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 인출식 설정 (신규 패널) -->
+            <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-indigo-400">
+                <h2 class="font-bold text-lg mb-1 text-gray-700">4. 인출식 설정</h2>
+                
+                <!-- 양도세 인출전략 (연단위) 체크박스 - mb-1로 간격 축소 -->
+                <div class="flex items-center gap-2 mb-1">
+                    <input type="checkbox" id="enableAnnualWithdrawal" onclick="toggleWithdrawalCheckboxes('annual')" class="w-4 h-4 text-pink-600 rounded focus:ring-pink-500 border-gray-300 cursor-pointer">
+                    <label for="enableAnnualWithdrawal" class="text-xs font-medium text-gray-700 select-none font-bold">양도세 인출전략 사용</label>
+                </div>
+
+                <!-- 기존 인출식 기능 사용 체크박스 - mb-2로 간격 최소화 -->
+                <div class="flex items-center gap-2 mb-2">
+                    <input type="checkbox" id="enableWithdrawal" onclick="toggleWithdrawalCheckboxes('period')" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300 cursor-pointer">
+                    <label for="enableWithdrawal" class="text-xs font-medium text-gray-700 select-none font-bold">기간 인출 사용</label>
+                </div>
+
+                <div class="space-y-1"> <!-- space-y-1로 간격 최소화 -->
+                    
+                    <!-- 인출 시작일 / 최대 인출일 (2열 그리드, gap-1로 축소) -->
+                    <div class="grid grid-cols-2 gap-1 text-xs"> 
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-0.5">인출 시작일</label>
+                            <input type="date" id="withdrawStartDate" value="2024-01-02" class="w-full border border-gray-300 rounded px-2 py-0.5 text-xs focus:ring-2 focus:ring-indigo-200 outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-0.5">최대 인출일</label>
+                            <input type="date" id="withdrawEndDate" value="2025-12-03" class="w-full border border-gray-300 rounded px-2 py-0.5 text-xs focus:ring-2 focus:ring-indigo-200 outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed">
+                        </div>
+                    </div>
+
+                    <!-- 증감함수지수 (분리된 행, 구분선 없음) -->
+                    <div class="text-xs"> 
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-0.5">증감함수지수</label>
+                            <input type="number" id="withdrawExponent" value="2.0" step="0.01" class="w-full border border-gray-300 rounded px-2 py-0.5 text-right text-xs focus:ring-2 focus:ring-indigo-200 outline-none">
+                        </div>
+                    </div>
+                    
+                    <!-- 인출률 시작/최대 설정 (위아래 분리, 정수 입력, 패딩 없음) -->
+                    <div class="space-y-1 pt-0.5">
+                        <!-- 시작 인출률 -->
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="text-xs font-bold text-gray-600">시작 인출률 (%)</label>
+                            <div class="flex items-center">
+                                <!-- 정수 입력 step=1 -->
+                                <input type="number" id="withdrawStartRate" value="0" step="1" class="w-12 border border-gray-300 rounded px-1 py-0.5 text-right text-xs font-bold text-gray-700 outline-none">
+                                <span class="text-gray-500 text-[10px] ml-1">%</span>
+                            </div>
+                        </div>
+                        <!-- 최대 인출률 -->
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="text-xs font-bold text-gray-600">최대 인출률 (%)</label>
+                            <div class="flex items-center">
+                                <!-- 정수 입력 step=1 -->
+                                <input type="number" id="withdrawMaxRate" value="50" step="1" class="w-12 border border-gray-300 rounded px-1 py-0.5 text-right text-xs font-bold text-gray-700 outline-none">
                                 <span class="text-gray-500 text-[10px] ml-1">%</span>
                             </div>
                         </div>
@@ -225,12 +289,42 @@
                     <p id="resCalmar" class="text-lg font-extrabold text-pink-600 mt-1">-</p>
                 </div>
             </div>
+            
+            <!-- 연도별 성과 분석 테이블 -->
+            <div id="annualMetricsArea" class="bg-white p-4 rounded-lg shadow mb-6 border border-gray-200">
+                <h3 class="font-bold text-lg mb-3 px-2 text-gray-700">🗓️ 연도별 성과 분석</h3>
+                <table class="min-w-full text-xs text-right border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase border-b">
+                            <th class="py-2 px-3 text-center">연도</th>
+                            <th class="py-2 px-2 text-right">시작 자산 ($)</th>
+                            <th class="py-2 px-2 text-right">종료 자산 ($)</th>
+                            <th class="py-2 px-2 text-right">수익률 (%)</th>
+                            <th class="py-2 px-2 text-right">MDD (%)</th>
+                            <th class="py-2 px-2 text-right">실현수익 ($)</th>
+                            <th class="py-2 px-2 text-right">연도별 인출액 ($)</th>
+                            <th class="py-2 px-2 text-right">인출/수익 비율 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="annualMetricsTableBody" class="text-gray-700 divide-y">
+                        <!-- JS로 채워짐 -->
+                    </tbody>
+                </table>
+            </div>
 
             <!-- 차트 영역 -->
             <div class="bg-white p-4 rounded-lg shadow mb-6 border border-gray-200" id="chartContainer">
                 <h3 class="font-bold text-lg mb-2 px-2 text-gray-700">📈 자산 및 주가 추이</h3>
                 <div class="relative h-[400px]">
                     <canvas id="strategyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- NEW: 반영률 변동 추이 차트 -->
+            <div class="bg-white p-4 rounded-lg shadow mb-6 border border-gray-200" id="rateChartContainer">
+                <h3 class="font-bold text-lg mb-2 px-2 text-gray-700">📊 반영률 변동 추이 (Rates)</h3>
+                <div class="relative h-[300px]">
+                    <canvas id="rateChart"></canvas>
                 </div>
             </div>
 
@@ -250,10 +344,12 @@
                             <th class="py-3 px-2 text-center">포트</th>
                             <th class="py-3 px-2 bg-blue-50 text-blue-700">목표가</th>
                             <th class="py-3 px-2 text-center bg-red-50 text-red-700">매도일</th>
+                            <th class="py-3 px-2 text-center text-indigo-700 font-bold">인출금</th>
                             <th class="py-3 px-2 font-bold">평가액</th>
                             <th class="py-3 px-2 text-gray-400">예수금</th>
                             <th class="py-3 px-2">실현수익</th>
                             <th class="py-3 px-2 text-gray-400">보유</th>
+                            <th class="py-3 px-2 text-right text-gray-500 border-l">DD</th> <!-- DD 컬럼 추가 -->
                         </tr>
                     </thead>
                     <tbody id="logTableBody" class="text-gray-700 divide-y">
@@ -266,6 +362,41 @@
 
     <!-- 스크립트 영역 -->
     <script>
+        // --- 상호 배제 체크박스 로직 (날짜 입력칸 상태 제어 추가) ---
+        function toggleWithdrawalCheckboxes(mode) {
+            const annualCheckbox = document.getElementById('enableAnnualWithdrawal');
+            const periodCheckbox = document.getElementById('enableWithdrawal');
+            const startDateInput = document.getElementById('withdrawStartDate');
+            const endDateInput = document.getElementById('withdrawEndDate');
+
+            if (mode === 'annual') {
+                if (annualCheckbox.checked) {
+                    periodCheckbox.checked = false;
+                    // 양도세 전략 사용 시 날짜 입력 비활성화
+                    startDateInput.disabled = true;
+                    endDateInput.disabled = true;
+                } else {
+                    // 체크 해제 시 기본적으로 활성화
+                    startDateInput.disabled = false;
+                    endDateInput.disabled = false;
+                }
+            } else if (mode === 'period') {
+                if (periodCheckbox.checked) {
+                    annualCheckbox.checked = false;
+                    // 기간 인출 사용 시 날짜 입력 활성화
+                    startDateInput.disabled = false;
+                    endDateInput.disabled = false;
+                } else {
+                    // 기간 인출 체크 해제 시.. 만약 양도세도 체크 안되어 있다면 활성화
+                    if (!annualCheckbox.checked) {
+                        startDateInput.disabled = false;
+                        endDateInput.disabled = false;
+                    }
+                }
+            }
+        }
+        // -----------------------------
+
         // --- 상수 및 전역 변수 ---
         const SHEET_ID = '1CY8hVPAXfPZZOfBgTaU5ygeLg4OXR14So_6dhfyoJjs';
         const SHEET_NAME = 'DBALL';
@@ -276,17 +407,16 @@
         let rawPriceData = [];
         let rawModeData = [];
         let chartInstance = null;
+        let rateChartInstance = null; // NEW: 반영률 차트 인스턴스
 
         window.addEventListener('load', loadFromGoogleSheet);
 
         // --- 유틸리티 함수 ---
-        // 내림(절사) 처리 함수
         function floorVal(val, decimals) {
             const factor = Math.pow(10, decimals);
             return Math.floor(val * factor) / factor;
         }
 
-        // 반올림 처리 함수 (Math.round를 사용하되, 자릿수를 지정 가능하게 확장)
         function roundVal(val, decimals) {
             const factor = Math.pow(10, decimals);
             return Math.round(val * factor) / factor;
@@ -295,34 +425,19 @@
         function parseDate(dateStr) {
             if (!dateStr) return null;
             let s = String(dateStr).trim();
-            
-            // Aggressive cleaning: remove non-essential chars (spaces, commas, parentheses, zero-width space)
-            s = s.replace(/\s*\(.*\)\s*$/, '')
-                 .replace(/\.$/, '')
-                 .replace(/[\s,]/g, '')
-                 .replace(/\u200B/g, ''); // Remove zero-width space
-
-            // Convert all common separators (., /) to hyphen (-)
+            s = s.replace(/\s*\(.*\)\s*$/, '').replace(/\.$/, '').replace(/[\s,]/g, '').replace(/\u200B/g, '');
             s = s.replace(/[\.\/]/g, '-');
-            
             const parts = s.split('-');
-            
             if (parts.length === 3) {
-                // Ensure 4-digit year (handles 25-08-15 -> 2025-08-15)
                 if (parts[0].length === 2) {
                     parts[0] = '20' + parts[0];
                 }
             } else {
-                return null; // Invalid format
+                return null;
             }
-            
-            // Attempt to create Date object
             const date = new Date(parts.join('-'));
-            
-            // Use date.getTime() to check validity robustly
             return isNaN(date.getTime()) ? null : date;
         }
-
 
         function formatNum(num, fixed=2) {
             return num.toLocaleString(undefined, {minimumFractionDigits: fixed, maximumFractionDigits: fixed});
@@ -340,8 +455,7 @@
             `;
             if (manualLink) manualLink.classList.add('hidden');
 
-            // Cache Busting: URL에 현재 시간을 추가하여 강제로 새 데이터를 불러옴
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${SHEET_NAME}&_t=${Date.now()}`;
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&t=${Date.now()}`;
             
             try {
                 const response = await fetch(url);
@@ -381,23 +495,16 @@
 
             for (let i = 132; i < data.length; i++) {
                 const row = data[i];
-                
                 if (!row[0] || !row[1]) continue;
-
                 const date = parseDate(row[0]);
                 const priceStr = String(row[1]).replace(/,/g, '');
                 const price = parseFloat(priceStr);
-
-                // 파싱 성공 및 유효한 가격일 경우에만 데이터 추가
                 if (date && !isNaN(price)) {
                     rawPriceData.push({ date: date, close: price });
-                    if (date.toISOString().slice(0, 10) === targetDateStr) {
-                         foundTargetDate = true;
-                    }
+                    if (date.toISOString().slice(0, 10) === targetDateStr) foundTargetDate = true;
                 }
             }
             
-            // 모드 데이터 로딩
             for (let i = 3; i < data.length; i++) {
                 const row = data[i];
                 if (!row[4] || !row[7]) continue; 
@@ -416,17 +523,6 @@
                 const startY = rawPriceData[0].date.getFullYear();
                 const endY = rawPriceData[rawPriceData.length-1].date.getFullYear();
                 
-                // --- 최종 디버깅 로그 (문제 해결 확인용) ---
-                console.log("--- [데이터 로드 최종 확인] ---");
-                console.log(`총 주가 데이터 개수: ${rawPriceData.length}개`);
-                if (foundTargetDate) {
-                    console.log('✅ 2025-08-15 데이터가 성공적으로 로드되어 백테스트에 사용될 예정입니다.');
-                } else {
-                    // 파싱 로직을 수정했음에도 실패하면 원본 데이터 형식에 문제가 있음을 다시 알림
-                    console.error('❌ 날짜 파싱 로직을 강화했으나 2025-08-15 데이터가 여전히 로드되지 않았습니다. 원본 CSV 파일의 2025-08-15 날짜 셀을 확인해 주세요. (날짜가 쉼표나 다른 이상 문자를 포함하는지)');
-                }
-                console.log("------------------------");
-                
                 badge.className = "flex items-center gap-2 text-sm font-bold text-green-600 bg-white px-3 py-1 rounded-full shadow-sm";
                 badge.innerHTML = `🟢 데이터 준비됨 (${startY}~${endY})`;
                 badge.onclick = null;
@@ -441,17 +537,12 @@
         function runBacktest() {
             if (rawPriceData.length === 0) { alert("데이터 로딩 중입니다. 잠시만 기다려주세요."); return; }
 
-            // 콤마 제거 후 파싱
             const inputInitialCapital = parseFloat(document.getElementById('initialCapital').value.replace(/,/g, ''));
             const inputBrokerFee = parseFloat(document.getElementById('brokerFee').value);
-            const useSecFee = document.getElementById('useSecFee').checked; // SEC Fee 체크 여부 확인
+            const useSecFee = document.getElementById('useSecFee').checked; 
             const startDate = new Date(document.getElementById('startDate').value);
-            
-            // 종료일 보정: 사용자가 '2025-12-02'를 선택하면 00:00:00이 되어
-            // 데이터의 12-02가 시간차로 인해 잘릴 수 있으므로, 종료일의 시간을 23:59:59로 강제 설정
-            const endDateInput = new Date(document.getElementById('endDate').value);
-            const endDate = new Date(endDateInput);
-            endDate.setHours(23, 59, 59, 999);
+            const endDate = new Date(document.getElementById('endDate').value);
+            endDate.setHours(23, 59, 59, 999); 
 
             const sf = {
                 loc: 1 + (parseFloat(document.getElementById('sfLoc').value)/100),
@@ -470,57 +561,69 @@
             const reinvestRate = parseFloat(document.getElementById('reinvestRate').value) / 100;
             const lossRate = parseFloat(document.getElementById('lossRate').value) / 100;
 
+            // --- 인출식 설정 로드 ---
+            const enableWithdrawal = document.getElementById('enableWithdrawal').checked;
+            const enableAnnualWithdrawal = document.getElementById('enableAnnualWithdrawal').checked; 
+            
+            if (enableWithdrawal && enableAnnualWithdrawal) {
+                 alert("기간 인출 사용과 연단위 인출 사용은 중복 활성화할 수 없습니다.");
+                 return;
+            }
+
+            const withdrawStartDate = new Date(document.getElementById('withdrawStartDate').value);
+            const withdrawEndDate = new Date(document.getElementById('withdrawEndDate').value);
+            const withdrawStartRate = parseFloat(document.getElementById('withdrawStartRate').value) / 100;
+            const withdrawMaxRate = parseFloat(document.getElementById('withdrawMaxRate').value) / 100;
+            const withdrawExponent = parseFloat(document.getElementById('withdrawExponent').value);
+            
+            const isWithdrawalMode = enableWithdrawal || enableAnnualWithdrawal; 
+            
+            function getWithdrawalRate(currentDate) {
+                if (!isWithdrawalMode) return 0;
+                let wStart = withdrawStartDate;
+                let wEnd = withdrawEndDate;
+                if (enableAnnualWithdrawal) {
+                    const currentYear = currentDate.getFullYear();
+                    const startYear = startDate.getFullYear();
+                    wStart = new Date(currentYear, 0, 1); 
+                    wEnd = new Date(currentYear, 11, 31); 
+                    wEnd.setHours(23, 59, 59, 999);
+                    if (currentYear === startYear) wStart = startDate;
+                    if (currentDate < wStart) return 0;
+                } else {
+                    if (currentDate < wStart) return 0;
+                    if (currentDate >= wEnd) return roundVal(withdrawMaxRate, 4);
+                }
+                if (currentDate >= wEnd) return roundVal(withdrawMaxRate, 4);
+                
+                const timeDiffStart = currentDate.getTime() - wStart.getTime();
+                const totalTimeDiff = wEnd.getTime() - wStart.getTime(); 
+                if (totalTimeDiff <= 0) return roundVal(withdrawMaxRate, 4);
+                
+                const progress = timeDiffStart / totalTimeDiff;
+                const scaledProgress = Math.pow(progress, withdrawExponent);
+                const rate = withdrawStartRate + (withdrawMaxRate - withdrawStartRate) * scaledProgress;
+                return roundVal(rate, 4); 
+            }
+
             let mergedData = [];
             let currentModeIdx = 0;
-            
-            // 1. Find the index of the first data point *on or after* startDate
             let priceStartIndex = rawPriceData.findIndex(p => p.date >= startDate);
+            if (priceStartIndex === -1) { alert("선택된 시작일 이후의 데이터가 없습니다."); return; }
+            let loopStart = priceStartIndex > 0 ? priceStartIndex - 1 : priceStartIndex;
 
-            if (priceStartIndex === -1) {
-                alert("선택된 시작일 이후의 데이터가 없습니다.");
-                return;
-            }
-
-            // 2. Include the day *before* startDate if available (for 'prevClose')
-            let loopStart = priceStartIndex;
-            if (priceStartIndex > 0) {
-                loopStart = priceStartIndex - 1;
-            }
-
-            // 3. Populate mergedData from the reference day (if exists) up to endDate
             for (let i = loopStart; i < rawPriceData.length; i++) {
                 const p = rawPriceData[i];
-
-                // Stop if date exceeds the user's endDate
                 if (p.date > endDate) break;
-
-                // --- Mode Finding Logic ---
                 while (currentModeIdx < rawModeData.length - 1 && rawModeData[currentModeIdx + 1].date <= p.date) {
                     currentModeIdx++;
                 }
-                
                 let mode = rawModeData.length > 0 ? rawModeData[currentModeIdx].mode : 'SF'; 
                 if (rawModeData.length > 0 && p.date < rawModeData[0].date) mode = rawModeData[0].mode;
-                // --- End Mode Finding Logic ---
-
                 mergedData.push({ date: p.date, close: p.close, mode: mode });
             }
 
-            if (mergedData.length < 2) { 
-                alert("백테스트를 실행하기 위한 최소 2일(전일 종가 및 시작일)의 데이터가 부족합니다."); 
-                return; 
-            } 
-
-            // --- 디버깅 로그 1: 병합된 데이터 확인 ---
-            console.log(`\n--- [백테스트 데이터 병합 결과] ---`);
-            console.log(`총 병합된 데이터 개수: ${mergedData.length}일`);
-            console.log(`[0] 기준일(전일): ${mergedData[0].date.toISOString().slice(0, 10)}`);
-            console.log(`[1] 실제 매매 시작일: ${mergedData[1].date.toISOString().slice(0, 10)}`);
-            if (mergedData.length > 2) {
-                console.log(`[2] 다음 거래일: ${mergedData[2].date.toISOString().slice(0, 10)}`);
-            }
-            console.log("---------------------------------");
-            // ----------------------------------------
+            if (mergedData.length < 2) { alert("백테스트를 실행하기 위한 최소 2일(전일 종가 및 시작일)의 데이터가 부족합니다."); return; } 
 
             let investCapital = inputInitialCapital;
             let cash = inputInitialCapital;
@@ -528,10 +631,9 @@
             let history = [];
             let daysSinceUpdate = 0;
             let periodProfit = 0;
-            let cumulativeProfit = 0;
+            let cumulativeProfit = 0; 
+            let cumulativeWithdrawal = 0; 
 
-            
-            // 루프는 두 번째 날짜(mergedData[1], 즉 시작일)부터 시작하여 첫 날짜(mergedData[0], 전일)의 종가를 전일 기준으로 사용하여 매매 로직 실행
             for (let i = 1; i < mergedData.length; i++) {
                 const curr = mergedData[i];
                 const prev = mergedData[i-1];
@@ -539,22 +641,38 @@
                 const close = curr.close;
                 const prevClose = prev.close;
                 const mode = curr.mode;
-                const dateStr = date.toISOString().slice(0, 10);
                 
-                if (dateStr === '2025-08-15') {
-                    console.log(`🎉 [LOOP CONFIRM] 2025-08-15의 거래 로직을 실행합니다.`);
-                }
-
-
                 let precPrice = 2, precSeed = 0;
                 if (date >= DECIMAL_4_START && date <= DECIMAL_4_END) {
                     precPrice = 4; precSeed = 2;
                 }
-
+                const precWithdraw = precPrice + 2;
                 const startHoldingsCnt = holdings.length;
-
-                // daysSinceUpdate increment
                 daysSinceUpdate++;
+
+                // --- Rate Validation Logic (Fixed Ratio Logic Applied) ---
+                let currentWithdrawRate = 0;
+                if (isWithdrawalMode) {
+                    currentWithdrawRate = getWithdrawalRate(date);
+                }
+                
+                // 1. Calculate Adjusted Reinvest Rate (Simple Subtraction)
+                let adjustedReinvestRate = reinvestRate - currentWithdrawRate;
+                if (adjustedReinvestRate < 0) adjustedReinvestRate = 0;
+                
+                // 2. Calculate Reduction Ratio
+                let reductionRatio = 0;
+                if (reinvestRate > 0) {
+                    reductionRatio = adjustedReinvestRate / reinvestRate;
+                }
+                
+                // 3. Calculate Adjusted Loss Rate (Proportional Reduction)
+                let adjustedLossRate = lossRate * reductionRatio;
+                
+                // Round for display/storage if needed, but keep precision for calc
+                let effectiveReinvestRate = roundVal(adjustedReinvestRate, 4);
+                let effectiveLossRate = roundVal(adjustedLossRate, 4);
+                // ---------------------------------------------------------
 
                 let buyingPower = cash;
                 let nextHoldings = [];
@@ -562,10 +680,7 @@
 
                 for (let h of holdings) {
                     let rule = (h.mode === 'SF' || h.mode === '안전') ? sf : ag;
-                    
-                    // NEW: 목표 매도가 (targetPrice) - precPrice + 반올림
                     let targetPrice = roundVal(h.buyPrice * rule.profit, precPrice);
-                    
                     let isSold = false, sellPrice = 0;
 
                     if (h.daysHeld >= (rule.hold - 1)) { isSold = true; sellPrice = close; }
@@ -573,35 +688,20 @@
 
                     if (isSold) {
                         let revenue = sellPrice * h.qty;
-                        
-                        // NEW: 위탁 수수료 (feeBroker) - precPrice + 내림
                         let feeBroker = floorVal(revenue * (inputBrokerFee/100), precPrice);
-                        
-                        // SEC Fee 조건부 계산
-                        // NEW: SEC Fee (feeSec) - precPrice + 내림 (기존 toFixed에서 floorVal로 변경)
                         let feeSec = 0;
                         if (useSecFee) {
                             let tempSecFee = revenue * SEC_FEE_RATE;
                             feeSec = floorVal(tempSecFee, precPrice);
                         }
-                        
                         let fee = feeBroker + feeSec;
-                        
                         let netRev = revenue - fee;
-                        let profit = netRev - (h.buyPrice * h.qty) - (h.buyFee || 0); // 소수점 처리 안 된 원본 이익
-
-                        // NEW: 실현 손익 (profit) - precPrice + 반올림 (화면 표시용)
+                        let profit = netRev - (h.buyPrice * h.qty) - (h.buyFee || 0); 
                         let roundedProfit = roundVal(profit, precPrice);
-                        
-                        // NEW: 예수금 (cash) - precPrice + 반올림
                         let roundedNetRev = roundVal(netRev, precPrice);
-
-                        cash = roundVal(cash + roundedNetRev, precPrice); // 예수금 업데이트 시에도 precPrice 반올림 적용
-                        cumulativeProfit += roundedProfit; // 화면 표시용 누적은 반올림 값 사용
-                        
-                        // [수정됨] 투자금 갱신용 기간 수익 합산은 '원본 값(profit)'을 그대로 더함
+                        cash = roundVal(cash + roundedNetRev, precPrice); 
+                        cumulativeProfit += roundedProfit; 
                         periodProfit += profit; 
-                        
                         soldToday = true;
                         h.sellDate = date;
                     } else {
@@ -613,41 +713,27 @@
 
                 let rule = (mode === 'SF' || mode === '안전') ? sf : ag;
                 let splitCnt = (mode === 'SF' || mode === '안전') ? sf.split : ag.split;
-
-                // NEW: 목표 매수가 (targetBuyPrice) - precPrice + 내림
                 let targetBuyPrice = floorVal(prevClose * rule.loc, precPrice);
                 let buyExecutedQty = 0;
                 let newPort = null;
 
                 if (startHoldingsCnt < splitCnt) {
                     if (close <= targetBuyPrice) {
-                        // NEW: 1회 분할 시드 (onePortCash) - precSeed + 내림
                         let onePortCash = floorVal(investCapital / splitCnt, precSeed);
-
                         if (targetBuyPrice > 0) {
-                            // NEW: 매수 수량 (qty) - 정수 + 내림
                             let qty = Math.floor(onePortCash / targetBuyPrice);
                             let estAmt = qty * targetBuyPrice;
-                            
-                            // 매수 수수료 산정 시, 정밀도 기준은 precPrice + 내림으로 유지
                             let estFee = floorVal(estAmt * (inputBrokerFee/100), precPrice);
-
                             if ((estAmt + estFee) > buyingPower) {
-                                // 매수 여력이 부족하면 구매 가능 수량 다시 계산 (내림)
                                 qty = Math.floor(buyingPower / (targetBuyPrice * (1 + (inputBrokerFee/100))));
                             }
-
                             if (qty > 0) {
                                 let buyAmt = qty * close;
                                 let fee = floorVal(buyAmt * (inputBrokerFee/100), precPrice);
                                 let totalCost = buyAmt + fee;
-
                                 if (totalCost <= cash) {
                                     cash -= totalCost;
-                                    
-                                    // 예수금 차감 후 precPrice 반올림
                                     cash = roundVal(cash, precPrice); 
-
                                     buyExecutedQty = qty;
                                     newPort = {
                                         buyDate: date, buyPrice: close, qty: qty, mode: mode, daysHeld: 0, buyFee: fee, sellDate: null
@@ -659,20 +745,41 @@
                     }
                 }
 
-                // --- CAPITAL UPDATE LOGIC MOVED HERE ---
-                // Update happens AFTER trading on the cycle day (e.g., Day 10)
-                // This ensures Day 10 profits are included, and Day 11 uses new capital.
+                let currentWithdrawnAmount = 0; 
                 if (daysSinceUpdate >= capitalCycle) {
-                    let profitToReinvest = periodProfit * (periodProfit > 0 ? reinvestRate : lossRate);
-                    investCapital += profitToReinvest;
+                    // Re-calculate daily withdrawal rate for the cycle check day
+                    const dailyWithdrawRate = getWithdrawalRate(date);
                     
-                    // NEW: 총 투자금 (investCapital) - precSeed + 반올림
+                    // --- Capital Update Logic with Proportional Loss Rate ---
+                    let adjReinvest = reinvestRate - dailyWithdrawRate;
+                    if(adjReinvest < 0) adjReinvest = 0;
+                    
+                    let redRatio = 0;
+                    if(reinvestRate > 0) {
+                        redRatio = adjReinvest / reinvestRate;
+                    }
+                    let adjLoss = lossRate * redRatio;
+                    
+                    // Use adjusted rates for capital update
+                    let profitToReinvest = periodProfit * (periodProfit > 0 ? adjReinvest : adjLoss);
+                    // --------------------------------------------------------
+                    
+                    if (isWithdrawalMode && periodProfit > 0.00000001) { 
+                        currentWithdrawnAmount = roundVal(periodProfit * dailyWithdrawRate, precWithdraw);
+                    }
+                    
+                    investCapital += profitToReinvest;
                     investCapital = roundVal(investCapital, precSeed);
                     
+                    const isLastDayOfBacktest = date.getTime() >= endDate.getTime();
+                    if (!enableAnnualWithdrawal || !isLastDayOfBacktest || date.getFullYear() === endDate.getFullYear()) {
+                        cash = roundVal(cash - currentWithdrawnAmount, precPrice);
+                    }
+                    
+                    cumulativeWithdrawal += currentWithdrawnAmount;
                     periodProfit = 0;
                     daysSinceUpdate = 0;
                 }
-                // ---------------------------------------
 
                 let stockVal = holdings.reduce((sum, h) => sum + (h.qty * close), 0);
                 let totalQty = holdings.reduce((sum, h) => sum + h.qty, 0);
@@ -683,38 +790,129 @@
                     capital: investCapital, bp: buyingPower,
                     targetBuy: targetBuyPrice, buyQty: buyExecutedQty, newPort: newPort,
                     val: totalAsset, cash: cash, profit: cumulativeProfit,
-                    qty: totalQty, cnt: holdings.length, sold: soldToday
+                    qty: totalQty, cnt: holdings.length, sold: soldToday,
+                    withdrawnAmount: currentWithdrawnAmount,
+                    cumulativeWithdrawal: cumulativeWithdrawal,
+                    // Store rates for the new chart
+                    effReinvestRate: effectiveReinvestRate * 100, 
+                    effLossRate: effectiveLossRate * 100,         
+                    withdrawRate: currentWithdrawRate * 100,       
+                    dd: 0 
                 });
             }
-
-            // --- 디버깅 로그 3: 최종 기록된 내역 확인 ---
-            const finalHistoryDates = history.map(h => h.date.toISOString().slice(0, 10));
-            console.log(`\n--- [최종 기록 내역 확인] ---`);
-            console.log(`총 기록된 일수: ${history.length}일`);
-            if (finalHistoryDates.includes('2025-08-15')) {
-                console.log('✅ 2025-08-15가 최종 기록에 포함되었습니다.');
-            } else {
-                console.error('❌ 2025-08-15가 최종 기록에 포함되지 않았습니다.');
-            }
-            console.log(`기록 시작일: ${finalHistoryDates[0]}`);
-            console.log(`기록 종료일: ${finalHistoryDates[finalHistoryDates.length - 1]}`);
-            console.log("---------------------------------");
             
             displayResults(history, inputInitialCapital);
         }
 
+        function calculateAnnualMetrics(history, initialCapital) {
+            if (history.length === 0) return [];
+            let annualMetrics = [];
+            let currentYear = history[0].date.getFullYear();
+            let yearData = [];
+            let startValue = initialCapital; 
+            let startCumulativeProfit = 0; 
+            let startCumulativeWithdrawal = 0; 
+            
+            for (let i = 0; i < history.length; i++) {
+                const h = history[i];
+                const year = h.date.getFullYear();
+                if (year !== currentYear) {
+                    if (yearData.length > 0) {
+                        const endValue = yearData[yearData.length - 1].val;
+                        const endCumulativeProfit = yearData[yearData.length - 1].profit; 
+                        const endCumulativeWithdrawal = yearData[yearData.length - 1].cumulativeWithdrawal; 
+                        const totalReturn = ((endValue - startValue) / startValue) * 100;
+                        let maxPeak = startValue;
+                        let annualMDD = 0;
+                        yearData.forEach(d => {
+                            if (d.val > maxPeak) maxPeak = d.val;
+                            const dd = ((d.val - maxPeak) / maxPeak) * 100;
+                            if (dd < annualMDD) annualMDD = dd;
+                        });
+                        const annualRealizedProfit = endCumulativeProfit - startCumulativeProfit;
+                        const annualWithdrawal = endCumulativeWithdrawal - startCumulativeWithdrawal;
+                        let withdrawalRatioVsProfit = 0;
+                        if (annualRealizedProfit > 0) {
+                            withdrawalRatioVsProfit = (annualWithdrawal / annualRealizedProfit) * 100;
+                        }
+                        annualMetrics.push({
+                            year: currentYear, startValue: startValue, endValue: endValue,
+                            annualReturn: totalReturn, annualMDD: annualMDD,
+                            annualRealizedProfit: annualRealizedProfit, 
+                            cumulativeWithdrawal: annualWithdrawal, 
+                            withdrawalRatioVsProfit: withdrawalRatioVsProfit 
+                        });
+                        startValue = endValue;
+                        startCumulativeProfit = endCumulativeProfit; 
+                        startCumulativeWithdrawal = endCumulativeWithdrawal; 
+                        currentYear = year;
+                        yearData = [];
+                    }
+                }
+                yearData.push(h);
+            }
+            if (yearData.length > 0) {
+                const endValue = yearData[yearData.length - 1].val;
+                const endCumulativeProfit = yearData[yearData.length - 1].profit;
+                const endCumulativeWithdrawal = yearData[yearData.length - 1].cumulativeWithdrawal;
+                const totalReturn = ((endValue - startValue) / startValue) * 100;
+                let maxPeak = startValue;
+                let annualMDD = 0;
+                yearData.forEach(d => {
+                    if (d.val > maxPeak) maxPeak = d.val;
+                    const dd = ((d.val - maxPeak) / maxPeak) * 100;
+                    if (dd < annualMDD) annualMDD = dd;
+                });
+                const annualRealizedProfit = endCumulativeProfit - startCumulativeProfit;
+                const annualWithdrawal = endCumulativeWithdrawal - startCumulativeWithdrawal;
+                let withdrawalRatioVsProfit = 0;
+                if (annualRealizedProfit > 0) {
+                    withdrawalRatioVsProfit = (annualWithdrawal / annualRealizedProfit) * 100;
+                }
+                annualMetrics.push({
+                    year: currentYear, startValue: startValue, endValue: endValue,
+                    annualReturn: totalReturn, annualMDD: annualMDD,
+                    annualRealizedProfit: annualRealizedProfit,
+                    cumulativeWithdrawal: annualWithdrawal,
+                    withdrawalRatioVsProfit: withdrawalRatioVsProfit
+                });
+            }
+            return annualMetrics;
+        }
+
+        function drawAnnualMetrics(annualMetrics) {
+            const tbody = document.getElementById('annualMetricsTableBody');
+            tbody.innerHTML = '';
+            annualMetrics.forEach(m => {
+                const returnClass = m.annualReturn >= 0 ? 'text-red-600 font-bold' : 'text-blue-600 font-bold';
+                const mddClass = m.annualMDD >= 0 ? 'text-gray-600' : 'text-red-600';
+                const profitClass = m.annualRealizedProfit >= 0 ? 'text-red-600 font-bold' : 'text-blue-600 font-bold';
+                const ratioClass = m.withdrawalRatioVsProfit > 0 && m.withdrawalRatioVsProfit <= 100 ? 'text-purple-700 font-bold' : (m.withdrawalRatioVsProfit > 100 ? 'text-red-700 font-bold' : 'text-gray-400');
+                const row = `
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="py-2 px-3 text-center font-bold">${m.year}</td>
+                        <td class="py-2 px-2 text-right">${formatNum(m.startValue, 0)}</td>
+                        <td class="py-2 px-2 text-right">${formatNum(m.endValue, 0)}</td>
+                        <td class="py-2 px-2 text-right ${returnClass}">${formatNum(m.annualReturn, 2)}%</td>
+                        <td class="py-2 px-2 text-right ${mddClass}">${formatNum(m.annualMDD, 2)}%</td>
+                        <td class="py-2 px-2 text-right ${profitClass}">${formatNum(m.annualRealizedProfit, 0)}</td>
+                        <td class="py-2 px-2 text-right text-indigo-700 font-bold">${formatNum(m.cumulativeWithdrawal, 2)}</td>
+                        <td class="py-2 px-2 text-right ${ratioClass}">${formatNum(m.withdrawalRatioVsProfit, 2)}%</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
         function displayResults(history, startVal) {
             document.getElementById('resultArea').classList.remove('hidden');
-
             const last = history[history.length - 1];
             const endVal = last.val;
             const totalProfit = endVal - startVal;
             const ret = (totalProfit / startVal) * 100;
-
             const days = (last.date - history[0].date) / (1000 * 60 * 60 * 24);
             const years = days / 365.25;
             const cagr = years > 0 ? (Math.pow(endVal/startVal, 1/years) - 1) * 100 : 0;
-
             let maxPeak = -Infinity, mdd = 0, sumDD = 0;
             let dds = [];
             history.forEach(h => {
@@ -723,9 +921,9 @@
                 if (dd < mdd) mdd = dd;
                 sumDD += dd;
                 dds.push(dd);
+                h.dd = dd * 100; 
             });
             mdd *= 100;
-
             const painIndex = Math.abs(sumDD / history.length) * 100;
             const gpr = painIndex > 0 ? cagr / painIndex : 0;
             const calmar = mdd !== 0 ? cagr / Math.abs(mdd) : 0;
@@ -738,55 +936,89 @@
             document.getElementById('resPain').innerText = `${formatNum(painIndex)}%`;
             document.getElementById('resGpr').innerText = formatNum(gpr);
             document.getElementById('resCalmar').innerText = formatNum(calmar);
-
+            
+            const annualMetrics = calculateAnnualMetrics(history, startVal);
+            drawAnnualMetrics(annualMetrics);
             drawChart(history, dds);
+            drawRateChart(history); // Call new chart
             drawTable(history);
         }
 
         function drawChart(history, dds) {
             const ctx = document.getElementById('strategyChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
-
             const labels = history.map(h => h.date.toISOString().slice(0, 10));
             const dataVal = history.map(h => h.val);
             const dataClose = history.map(h => h.close);
             const dataDD = dds.map(d => d * 100);
+            const dataWithdrawal = history.map(h => h.cumulativeWithdrawal);
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
+                        { label: '자산 가치 ($)', data: dataVal, borderColor: 'rgb(75, 192, 192)', backgroundColor: 'rgba(75, 192, 192, 0.1)', yAxisID: 'y', tension: 0.1, pointRadius: 0, fill: false },
+                        { label: 'SOXL 주가 ($)', data: dataClose, borderColor: 'rgb(255, 99, 132)', yAxisID: 'y1', tension: 0.1, pointRadius: 1, borderWidth: 1, fill: false },
+                        { label: '누적 인출액 ($)', data: dataWithdrawal, borderColor: 'rgb(100, 100, 200)', backgroundColor: 'rgba(100, 100, 200, 0.1)', yAxisID: 'y', tension: 0.1, pointRadius: 0, fill: false },
+                        { label: 'Drawdown (%)', data: dataDD, borderColor: 'rgba(153, 102, 255, 0.8)', backgroundColor: 'rgba(153, 102, 255, 0.2)', yAxisID: 'y2', type: 'line', fill: true, pointRadius: 0, borderWidth: 1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { ticks: { maxTicksLimit: 8, maxRotation: 0 } },
+                        y: { position: 'right', grid: { display: false }, title: { display: true, text: 'Asset Value / Withdrawal ($)' } },
+                        y1: { position: 'left', grid: { color: '#f3f4f6' }, title: { display: true, text: 'SOXL Price ($)' } },
+                        y2: { position: 'right', min: -100, max: 0, display: false }
+                    },
+                    plugins: { tooltip: { callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) label += ': '; if (context.parsed.y !== null) { label += formatNum(context.parsed.y); if (context.dataset.yAxisID === 'y2') label += '%'; } return label; } } } }
+                }
+            });
+        }
+
+        // --- NEW: 반영률 차트 그리기 함수 ---
+        function drawRateChart(history) {
+            const ctx = document.getElementById('rateChart').getContext('2d');
+            if (rateChartInstance) rateChartInstance.destroy();
+
+            const labels = history.map(h => h.date.toISOString().slice(0, 10));
+            const dataReinvest = history.map(h => h.effReinvestRate);
+            const dataLoss = history.map(h => h.effLossRate);
+            const dataWithdraw = history.map(h => h.withdrawRate);
+
+            rateChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
                         {
-                            label: '자산 가치 ($)',
-                            data: dataVal,
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                            yAxisID: 'y',
-                            tension: 0.1,
+                            label: '수익 시 반영률 (%)',
+                            data: dataReinvest,
+                            borderColor: 'rgb(34, 197, 94)', // Green-500
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            borderWidth: 2,
                             pointRadius: 0,
                             fill: false
                         },
                         {
-                            label: 'SOXL 주가 ($)',
-                            data: dataClose,
-                            borderColor: 'rgb(255, 99, 132)',
-                            yAxisID: 'y1',
-                            tension: 0.1,
-                            pointRadius: 1, 
-                            borderWidth: 1, 
+                            label: '손실 시 반영률 (%)',
+                            data: dataLoss,
+                            borderColor: 'rgb(239, 68, 68)', // Red-500
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
                             fill: false
                         },
                         {
-                            label: 'Drawdown (%)',
-                            data: dataDD,
-                            borderColor: 'rgba(153, 102, 255, 0.8)',
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            yAxisID: 'y2',
-                            type: 'line',
-                            fill: true,
+                            label: '인출률 (%)',
+                            data: dataWithdraw,
+                            borderColor: 'rgb(147, 51, 234)', // Purple-600
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            borderWidth: 1,
                             pointRadius: 0,
-                            borderWidth: 1
+                            borderDash: [5, 5], // 점선
+                            fill: true
                         }
                     ]
                 },
@@ -797,32 +1029,17 @@
                     scales: {
                         x: { ticks: { maxTicksLimit: 8, maxRotation: 0 } },
                         y: { 
-                            position: 'right', 
-                            grid: { display: false },
-                            title: { display: true, text: 'Asset Value ($)' }
-                        },
-                        y1: { 
-                            position: 'left', 
-                            grid: { color: '#f3f4f6' },
-                            title: { display: true, text: 'SOXL Price ($)' }
-                        },
-                        y2: {
-                            position: 'right',
-                            min: -100, max: 0,
-                            display: false 
+                            position: 'left',
+                            title: { display: true, text: 'Rate (%)' },
+                            min: 0, // 비율은 0% 이상
+                            suggestedMax: 100 
                         }
                     },
                     plugins: {
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) label += ': ';
-                                    if (context.parsed.y !== null) {
-                                        label += formatNum(context.parsed.y);
-                                        if (context.dataset.yAxisID === 'y2') label += '%';
-                                    }
-                                    return label;
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(4) + '%';
                                 }
                             }
                         }
@@ -837,18 +1054,24 @@
             
             const rows = history.map((h, i) => {
                 const dateStr = h.date.toISOString().slice(0, 10);
+                let priceDecimals = 2;
+                if (h.date >= DECIMAL_4_START && h.date <= DECIMAL_4_END) priceDecimals = 4;
+                
                 const modeClass = h.mode === 'AG' ? 'text-red-500 font-bold' : 'text-blue-500 font-bold';
                 const buyClass = h.buyQty > 0 ? 'bg-blue-50 font-bold text-blue-600' : 'text-gray-300';
                 
                 let sellDateStr = '-';
                 if (h.newPort) {
-                    if (h.newPort.sellDate) {
-                        sellDateStr = `<span class="text-red-600 font-bold">${h.newPort.sellDate.toISOString().slice(0, 10)}</span>`;
-                    } else {
-                        sellDateStr = '<span class="text-gray-400 text-[10px]">보유중</span>';
-                    }
+                    if (h.newPort.sellDate) sellDateStr = `<span class="text-red-600 font-bold">${h.newPort.sellDate.toISOString().slice(0, 10)}</span>`;
+                    else sellDateStr = '<span class="text-gray-400 text-[10px]">보유중</span>';
                 }
                 
+                let precSeed = 0; 
+                if (h.date >= DECIMAL_4_START && h.date <= DECIMAL_4_END) precSeed = 2;
+                const withdrawnAmountStr = h.withdrawnAmount > 0 ? formatNum(h.withdrawnAmount, precSeed) : '-';
+                const withdrawnClass = h.withdrawnAmount > 0 ? 'font-bold text-indigo-700 bg-indigo-50/50' : 'text-gray-400';
+                const ddClass = h.dd < 0 ? 'text-blue-600' : 'text-gray-300';
+
                 let changeRate = 0;
                 if (i > 0) {
                     const prevClose = history[i-1].close;
@@ -861,19 +1084,21 @@
                 return `
                     <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
                         <td class="py-2 px-2 text-center text-xs text-gray-500 sticky left-0 bg-white border-r border-gray-100">${dateStr}</td>
-                        <td class="py-2 px-2 text-right font-medium text-gray-700">${formatNum(h.close, 2)}</td>
+                        <td class="py-2 px-2 text-right font-medium text-gray-700">${formatNum(h.close, priceDecimals)}</td>
                         <td class="py-2 px-2 text-right text-[11px] ${changeClass}">${changeSign}${formatNum(changeRate)}%</td>
                         <td class="py-2 px-2 text-center text-xs ${modeClass}">${h.mode}</td>
                         <td class="py-2 px-2 text-right text-gray-600 font-mono">${formatNum(h.capital, 0)}</td>
                         <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.bp, 0)}</td>
                         <td class="py-2 px-2 text-center ${buyClass}">${h.buyQty > 0 ? h.buyQty : '-'}</td>
                         <td class="py-2 px-2 text-center font-bold text-gray-600">${h.cnt}</td>
-                        <td class="py-2 px-2 text-right text-blue-600 bg-blue-50/50 text-[11px]">${formatNum(h.targetBuy, 2)}</td>
+                        <td class="py-2 px-2 text-right text-blue-600 bg-blue-50/50 text-[11px]">${formatNum(h.targetBuy, priceDecimals)}</td>
                         <td class="py-2 px-2 text-center bg-red-50/50">${sellDateStr}</td>
+                        <td class="py-2 px-2 text-right ${withdrawnAmountStr !== '-' ? withdrawnClass : 'text-gray-400'}">${withdrawnAmountStr}</td>
                         <td class="py-2 px-2 text-right font-bold text-gray-800">${formatNum(h.val, 0)}</td>
                         <td class="py-2 px-2 text-right text-gray-400 font-mono">${formatNum(h.cash, 0)}</td>
                         <td class="py-2 px-2 text-right font-medium ${profitClass}">${formatNum(h.profit, 0)}</td>
                         <td class="py-2 px-2 text-right text-gray-500">${formatNum(h.qty, 0)}</td>
+                        <td class="py-2 px-2 text-right ${ddClass} border-l border-gray-100">${formatNum(h.dd, 2)}%</td>
                     </tr>
                 `;
             }).join('');
